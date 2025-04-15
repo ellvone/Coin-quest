@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Quest - Idle Clicker Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5dc;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        #game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #coin-button {
+            background: #ffd700;
+            border: none;
+            padding: 15px 30px;
+            font-size: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+            margin: 20px 0;
+        }
+        #coin-button:active {
+            transform: scale(0.95);
+        }
+        #coin-count {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .upgrade {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .upgrade:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        #workers {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .worker {
+            background: #e9e9e9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        #premium-section {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>💰 Coin Quest</h1>
+        <p>Click the coin to earn money! Hire workers to automate income.</p>
+        
+        <div id="coin-count">Coins: 0</div>
+        <button id="coin-button">🪙 Click Me!</button>
+        
+        <h2>🛠️ Upgrades</h2>
+        <button class="upgrade" id="double-click">2x Clicks (Cost: 50)</button>
+        <button class="upgrade" id="auto-clicker">Auto-Clicker (Cost: 100)</button>
+        
+        <h2>👷 Workers</h2>
+        <div id="workers">
+            <div class="worker">
+                <span>Miner: +1 coin/sec</span>
+                <button class="upgrade" id="hire-miner">Hire (Cost: 30)</button>
+                <span id="miner-count">0</span>
+            </div>
+            <div class="worker">
+                <span>Merchant: +5 coins/sec</span>
+                <button class="upgrade" id="hire-merchant">Hire (Cost: 150)</button>
+                <span id="merchant-count">0</span>
+            </div>
+        </div>
+        
+        <div id="premium-section">
+            <h2>💎 Premium</h2>
+            <p>Watch an ad to get 2x coins for 1 hour!</p>
+            <button class="upgrade" id="watch-ad">Watch Ad (+2x Boost)</button>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let coins = 0;
+        let clickPower = 1;
+        let autoClickerActive = false;
+        let miners = 0;
+        let merchants = 0;
+        let adBoostActive = false;
+        
+        // DOM Elements
+        const coinButton = document.getElementById("coin-button");
+        const coinCount = document.getElementById("coin-count");
+        const doubleClickBtn = document.getElementById("double-click");
+        const autoClickerBtn = document.getElementById("auto-clicker");
+        const hireMinerBtn = document.getElementById("hire-miner");
+        const hireMerchantBtn = document.getElementById("hire-merchant");
+        const minerCount = document.getElementById("miner-count");
+        const merchantCount = document.getElementById("merchant-count");
+        const watchAdBtn = document.getElementById("watch-ad");
+        
+        // Click Event
+        coinButton.addEventListener("click", () => {
+            coins += clickPower;
+            updateUI();
+        });
+        
+        // Upgrades
+        doubleClickBtn.addEventListener("click", () => {
+            if (coins >= 50) {
+                coins -= 50;
+                clickPower *= 2;
+                doubleClickBtn.disabled = true;
+                updateUI();
+            }
+        });
+        
+        autoClickerBtn.addEventListener("click", () => {
+            if (coins >= 100 && !autoClickerActive) {
+                coins -= 100;
+                autoClickerActive = true;
+                autoClickerBtn.disabled = true;
+                setInterval(() => {
+                    coins += clickPower;
+                    updateUI();
+                }, 1000);
+                updateUI();
+            }
+        });
+        
+        // Workers
+        hireMinerBtn.addEventListener("click", () => {
+            if (coins >= 30) {
+                coins -= 30;
+                miners++;
+                minerCount.textContent = miners;
+                updateUI();
+            }
+        });
+        
+        hireMerchantBtn.addEventListener("click", () => {
+            if (coins >= 150) {
+                coins -= 150;
+                merchants++;
+                merchantCount.textContent = merchants;
+                updateUI();
+            }
+        });
+        
+        // Ad Boost (Simulated)
+        watchAdBtn.addEventListener("click", () => {
+            if (!adBoostActive) {
+                adBoostActive = true;
+                clickPower *= 2;
+                watchAdBtn.disabled = true;
+                updateUI();
+                setTimeout(() => {
+                    adBoostActive = false;
+                    clickPower /= 2;
+                    watchAdBtn.disabled = false;
+                    updateUI();
+                }, 3600000); // 1 hour
+            }
+        });
+        
+        // Game Loop (Idle Income)
+        setInterval(() => {
+            coins += miners * 1;
+            coins += merchants * 5;
+            updateUI();
+        }, 1000);
+        
+        // Update UI
+        function updateUI() {
+            coinCount.textContent = `Coins: ${coins}`;
+            hireMinerBtn.disabled = coins < 30;
+            hireMerchantBtn.disabled = coins < 150;
+        }
+    </script>
+</body>
+</html>
